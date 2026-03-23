@@ -68,7 +68,6 @@
                                     <field name="product_level"/>
                                     <field name="qty"/>
                                     <field name="due_date"/>
-                                    <field name="sale_order_line_id" optional="hide"/>
                                 </list>
                             </field>
                         </page>

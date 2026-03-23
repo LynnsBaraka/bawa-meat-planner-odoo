@@ -164,6 +164,3 @@ class BawaPlanOrderLine(models.Model):
     ], string='Level', required=True)
     qty = fields.Float(string='Quantity (kg)', digits=(10, 3), required=True)
     due_date = fields.Date(string='Due Date')
-    sale_order_line_id = fields.Many2one(
-        'sale.order.line', string='Source Sale Order Line'
-    )

@@ -26,9 +26,6 @@
     'depends': [
         'stock',
         'mrp',
-        'sale',
-        'sale_management',
-        'product',
         'product_expiry',
         'mail',
         'web',
