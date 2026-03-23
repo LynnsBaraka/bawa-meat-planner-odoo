@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List View -->
+    <record id="view_bawa_yield_template_list" model="ir.ui.view">
+        <field name="name">bawa.yield.template.list</field>
+        <field name="model">bawa.yield.template</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="is_active_template"/>
+                <field name="notes"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_bawa_yield_template_form" model="ir.ui.view">
+        <field name="name">bawa.yield.template.form</field>
+        <field name="model">bawa.yield.template</field>
+        <field name="arch" type="xml">
+            <form string="Yield Template">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Template Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="is_active_template"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="notes" placeholder="Notes about this template..."/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="L1 to L2 Yields" name="l1_to_l2">
+                            <field name="l1_to_l2_json" widget="code" options="{'mode': 'json'}" placeholder='{"Hind Quarter": {"Rump": 18.0, ...}, "Fore Quarter": {...}}'/>
+                        </page>
+                        <page string="L2 to L3 Yields" name="l2_to_l3">
+                            <field name="l2_to_l3_json" widget="code" options="{'mode': 'json'}" placeholder='{"Rump": {"Rump Steak": 62, ...}, ...}'/>
+                        </page>
+                        <page string="Trim to L4 Specs" name="trim_to_l4">
+                            <field name="trim_to_l4_json" widget="code" options="{'mode': 'json'}" placeholder='{"Minced Meat": {"conversionYield": 92, ...}, ...}'/>
+                        </page>
+                        <page string="L5 Recipes" name="l5_recipes">
+                            <field name="l5_recipes_json" widget="code" options="{'mode': 'json'}" placeholder='{"Beef Sausages": {"inputs": [...], ...}, ...}'/>
+                        </page>
+                        <page string="Trim Candidates" name="trim_candidates">
+                            <field name="trim_candidates_json" widget="code" options="{'mode': 'json'}" placeholder='["Rump Trim", "Chuck Trim", ...]'/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_bawa_yield_template" model="ir.actions.act_window">
+        <field name="name">Yield Templates</field>
+        <field name="res_model">bawa.yield.template</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first yield template
+            </p>
+            <p>
+                Yield templates define the conversion percentages between
+                product hierarchy levels (Quarters, Primals, End Cuts, Value Add, Processed).
+            </p>
+        </field>
+    </record>
+
+</odoo>

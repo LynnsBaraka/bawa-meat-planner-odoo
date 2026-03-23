@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Root Menu -->
+    <menuitem
+        id="menu_bawa_root"
+        name="Meat Planner"
+        web_icon="bawa_meat_planner,static/description/icon.png"
+        sequence="50"
+    />
+
+    <!-- Planning Engine (client action) -->
+    <menuitem
+        id="menu_bawa_planning_engine"
+        name="Planning Engine"
+        parent="menu_bawa_root"
+        action="action_bawa_planning_engine"
+        sequence="10"
+    />
+
+    <!-- Supply Planner (client action) -->
+    <menuitem
+        id="menu_bawa_supply_planner"
+        name="Supply Planner"
+        parent="menu_bawa_root"
+        action="action_bawa_supply_planner"
+        sequence="20"
+    />
+
+    <!-- Plan History -->
+    <menuitem
+        id="menu_bawa_plan_history"
+        name="Plan History"
+        parent="menu_bawa_root"
+        action="action_bawa_plan_list"
+        sequence="30"
+    />
+
+    <!-- Configuration -->
+    <menuitem
+        id="menu_bawa_configuration"
+        name="Configuration"
+        parent="menu_bawa_root"
+        sequence="90"
+    />
+
+    <!-- Yield Templates (under Configuration) -->
+    <menuitem
+        id="menu_bawa_yield_templates"
+        name="Yield Templates"
+        parent="menu_bawa_configuration"
+        action="action_bawa_yield_template"
+        sequence="10"
+    />
+
+</odoo>

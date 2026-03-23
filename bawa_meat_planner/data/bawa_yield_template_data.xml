@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="bawa_plan_sequence" model="ir.sequence">
+            <field name="name">Butchery Production Plan</field>
+            <field name="code">bawa.plan</field>
+            <field name="prefix">PLAN/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <record id="bawa_yield_template_evergreen_standard" model="bawa.yield.template">
+            <field name="name">Evergreen Standard (Sep 2025 Block Test)</field>
+            <field name="code">YT-001</field>
+            <field name="is_active_template">True</field>
+            <field name="notes">Based on September 2025 block test workshops at Evergreen Dynamic Harvest Nigeria. Review after 3 to 6 months of production tracking using variance data.</field>
+            <field name="l1_to_l2_json"><![CDATA[{
+                "Hind Quarter": {
+                    "Rump": 18.0, "Topside": 11.0, "Silverside": 14.0,
+                    "Shin (Hind)": 7.0, "Knuckle": 5.0, "Flank": 4.5,
+                    "Tenderloin": 3.0, "Eye of Round": 4.0,
+                    "Bones (HQ)": 22.0, "Fat/Trim (HQ)": 11.5
+                },
+                "Fore Quarter": {
+                    "Chuck": 21.0, "Brisket": 13.0, "Ribs": 15.0, "Loin": 11.0,
+                    "Fore Shin": 5.0, "Neck": 4.5, "Shoulder Clod": 3.0,
+                    "Bones (FQ)": 17.0, "Fat/Trim (FQ)": 10.5
+                }
+            }]]></field>
+            <field name="l2_to_l3_json"><![CDATA[{
+                "Rump":          {"Rump Steak": 62, "Rump Roast": 24, "Rump Trim": 14},
+                "Topside":       {"Topside Roast": 58, "Topside Steak": 28, "Topside Trim": 14},
+                "Silverside":    {"Silverside Roast": 52, "Corned Beef Cut": 26, "Silverside Trim": 22},
+                "Shin (Hind)":   {"Osso Buco": 44, "Stewing Shin": 40, "Shin Trim": 16},
+                "Knuckle":       {"Knuckle Roast": 58, "Knuckle Trim": 42},
+                "Flank":         {"Flank Steak": 48, "Flank Trim": 52},
+                "Tenderloin":    {"Tenderloin Steak": 78, "Tenderloin Trim": 22},
+                "Eye of Round":  {"Eye Round Roast": 72, "Eye Round Trim": 28},
+                "Chuck":         {"Chuck Steak": 48, "Chuck Roast": 30, "Chuck Trim": 22},
+                "Brisket":       {"Brisket Flat": 52, "Brisket Point": 30, "Brisket Trim": 18},
+                "Ribs":          {"Ribeye Steak": 36, "Short Ribs": 34, "Rib Trim": 30},
+                "Loin":          {"Sirloin Roast": 28, "T-Bone Steak": 26, "Sirloin Steak": 24, "Loin Trim": 22},
+                "Fore Shin":     {"Fore Stewing": 50, "Fore Shin Trim": 50},
+                "Neck":          {"Neck Stew": 55, "Neck Trim": 45},
+                "Shoulder Clod": {"Shoulder Roast": 58, "Shoulder Trim": 42}
+            }]]></field>
+            <field name="trim_to_l4_json"><![CDATA[{
+                "Minced Meat": {
+                    "conversionYield": 92, "boneOut": 0, "fatMax": 20,
+                    "sourceYields": {
+                        "Rump Trim":95,"Topside Trim":93,"Silverside Trim":90,"Chuck Trim":88,
+                        "Loin Trim":94,"Rib Trim":86,"Brisket Trim":85,"Shin Trim":82,
+                        "Knuckle Trim":88,"Flank Trim":80,"Tenderloin Trim":96,"Eye Round Trim":91,
+                        "Fore Shin Trim":83,"Neck Trim":84,"Shoulder Trim":86,
+                        "Fat/Trim (HQ)":72,"Fat/Trim (FQ)":70,
+                        "Chuck":84,"Brisket":80,"Fore Shin":78,"Neck":72,"Shoulder Clod":82
+                    }
+                },
+                "Goulash Cubes":    {"conversionYield":88,"boneOut":5,"fatMax":12,"sourceYields":{"Chuck":82,"Brisket":76,"Fore Shin":72,"Neck":66,"Shoulder Clod":78}},
+                "Stewing Beef":     {"conversionYield":90,"boneOut":3,"fatMax":15,"sourceYields":{"Chuck":84,"Brisket":78,"Fore Shin":75,"Neck":70,"Shoulder Clod":80}},
+                "Diced Beef":       {"conversionYield":87,"boneOut":6,"fatMax":10,"sourceYields":{"Chuck":80,"Brisket":74,"Fore Shin":70,"Neck":64,"Shoulder Clod":76}},
+                "Kebab Cubes":      {"conversionYield":85,"boneOut":4,"fatMax":8,"sourceYields":{"Chuck":78,"Brisket":72,"Fore Shin":68,"Neck":62,"Shoulder Clod":74}},
+                "Burger Patty Mix": {"conversionYield":94,"boneOut":0,"fatMax":25,"sourceYields":{"Chuck":88,"Brisket":84,"Fore Shin":82,"Neck":76,"Shoulder Clod":86}},
+                "Boerewors Mix":    {"conversionYield":91,"boneOut":0,"fatMax":30,"sourceYields":{"Chuck":86,"Brisket":82,"Fore Shin":80,"Neck":74,"Shoulder Clod":84}}
+            }]]></field>
+            <field name="l5_recipes_json"><![CDATA[{
+                "Beef Sausages":          {"inputs":[{"product":"Minced Meat","ratio":0.55}],"nonMeat":[{"item":"Pork Fat","ratio":0.18,"uom":"kg"},{"item":"Sausage Casing","ratio":0.08,"uom":"m"},{"item":"Spice Mix","ratio":0.09,"uom":"kg"},{"item":"Rusk","ratio":0.05,"uom":"kg"},{"item":"Packaging","ratio":0.05,"uom":"pcs"}],"yieldPct":93,"leadTimeHrs":4,"shelfLifeDays":5},
+                "Beef Boerewors":         {"inputs":[{"product":"Boerewors Mix","ratio":0.60}],"nonMeat":[{"item":"Pork Fat","ratio":0.15,"uom":"kg"},{"item":"Sausage Casing","ratio":0.06,"uom":"m"},{"item":"Boerewors Spice","ratio":0.10,"uom":"kg"},{"item":"Vinegar","ratio":0.04,"uom":"L"},{"item":"Packaging","ratio":0.05,"uom":"pcs"}],"yieldPct":94,"leadTimeHrs":3,"shelfLifeDays":4},
+                "Marinated Rump Steak":   {"inputs":[{"product":"Rump Steak","ratio":0.82}],"nonMeat":[{"item":"Marinade","ratio":0.15,"uom":"L"},{"item":"Packaging","ratio":0.03,"uom":"pcs"}],"yieldPct":95,"leadTimeHrs":24,"shelfLifeDays":5},
+                "Beef Meatballs":         {"inputs":[{"product":"Minced Meat","ratio":0.60}],"nonMeat":[{"item":"Breadcrumbs","ratio":0.15,"uom":"kg"},{"item":"Onion Powder","ratio":0.05,"uom":"kg"},{"item":"Egg Powder","ratio":0.08,"uom":"kg"},{"item":"Seasoning","ratio":0.07,"uom":"kg"},{"item":"Packaging","ratio":0.05,"uom":"pcs"}],"yieldPct":96,"leadTimeHrs":2,"shelfLifeDays":3},
+                "Beef Stir-Fry Pack":     {"inputs":[{"product":"Diced Beef","ratio":0.75}],"nonMeat":[{"item":"Stir-Fry Sauce","ratio":0.15,"uom":"L"},{"item":"Vegetables (Mixed)","ratio":0.05,"uom":"kg"},{"item":"Packaging","ratio":0.05,"uom":"pcs"}],"yieldPct":98,"leadTimeHrs":1,"shelfLifeDays":2},
+                "Smoked Brisket":         {"inputs":[{"product":"Brisket Flat","ratio":0.90}],"nonMeat":[{"item":"Smoking Rub","ratio":0.05,"uom":"kg"},{"item":"Packaging","ratio":0.05,"uom":"pcs"}],"yieldPct":65,"leadTimeHrs":48,"shelfLifeDays":10},
+                "Beef Burgers (6-pack)":  {"inputs":[{"product":"Burger Patty Mix","ratio":0.68}],"nonMeat":[{"item":"Breadcrumbs","ratio":0.14,"uom":"kg"},{"item":"Seasoning","ratio":0.08,"uom":"kg"},{"item":"Egg Powder","ratio":0.05,"uom":"kg"},{"item":"Packaging","ratio":0.05,"uom":"pcs"}],"yieldPct":97,"leadTimeHrs":3,"shelfLifeDays":3},
+                "Seasoned Short Ribs":    {"inputs":[{"product":"Short Ribs","ratio":0.88}],"nonMeat":[{"item":"Spice Rub","ratio":0.08,"uom":"kg"},{"item":"Packaging","ratio":0.04,"uom":"pcs"}],"yieldPct":96,"leadTimeHrs":12,"shelfLifeDays":4},
+                "Marinated Kebabs":       {"inputs":[{"product":"Kebab Cubes","ratio":0.72}],"nonMeat":[{"item":"Kebab Marinade","ratio":0.18,"uom":"L"},{"item":"Skewers","ratio":0.05,"uom":"pcs"},{"item":"Packaging","ratio":0.05,"uom":"pcs"}],"yieldPct":95,"leadTimeHrs":12,"shelfLifeDays":3},
+                "Corned Beef (Processed)":{"inputs":[{"product":"Corned Beef Cut","ratio":0.80}],"nonMeat":[{"item":"Brine Solution","ratio":0.12,"uom":"L"},{"item":"Curing Salt","ratio":0.03,"uom":"kg"},{"item":"Packaging","ratio":0.05,"uom":"pcs"}],"yieldPct":75,"leadTimeHrs":120,"shelfLifeDays":21}
+            }]]></field>
+            <field name="trim_candidates_json"><![CDATA[[
+                "Rump Trim","Topside Trim","Silverside Trim","Chuck Trim","Loin Trim",
+                "Rib Trim","Brisket Trim","Shin Trim","Knuckle Trim","Flank Trim",
+                "Fore Shin Trim","Tenderloin Trim","Eye Round Trim","Neck Trim",
+                "Shoulder Trim","Fat/Trim (HQ)","Fat/Trim (FQ)"
+            ]]]></field>
+        </record>
+
+    </data>
+</odoo>

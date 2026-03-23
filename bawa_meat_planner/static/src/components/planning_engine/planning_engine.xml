@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+<t t-name="bawa_meat_planner.PlanningEngine">
+    <div class="bawa-planning-engine o_action p-3">
+
+        <!-- HEADER -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">Planning Engine</h2>
+            <div class="d-flex gap-2 align-items-center">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch"
+                           t-att-checked="state.recursiveDriverEnabled"
+                           t-on-change="toggleRecursiveDriver"/>
+                    <label class="form-check-label letter-spacing-1">
+                        Auto Scale Quarters
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- ORDER ENTRY PANEL -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <strong>Order Entry</strong>
+            </div>
+            <div class="card-body">
+                <div class="row g-2 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label">Product Name</label>
+                        <input type="text" class="form-control"
+                               t-att-value="state.newOrder.productName"
+                               t-on-input="(ev) => this.state.newOrder.productName = ev.target.value"
+                               placeholder="e.g. Beef Sausages"/>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Level</label>
+                        <select class="form-select"
+                                t-on-change="(ev) => this.state.newOrder.level = ev.target.value">
+                            <option value="3" t-att-selected="state.newOrder.level === '3'">L3: End Cut</option>
+                            <option value="4" t-att-selected="state.newOrder.level === '4'">L4: Value Add</option>
+                            <option value="5" t-att-selected="state.newOrder.level === '5'">L5: Finished</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Qty (kg)</label>
+                        <input type="number" class="form-control" min="0" step="0.1"
+                               t-att-value="state.newOrder.qty"
+                               t-on-input="(ev) => this.state.newOrder.qty = ev.target.value"/>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary w-100" t-on-click="addOrder">
+                            Add Order
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Orders List -->
+                <t t-if="state.orders.length">
+                    <table class="table table-sm mt-3 mb-0">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Level</th>
+                                <th>Qty (kg)</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="state.orders" t-as="order" t-key="order.id">
+                                <tr>
+                                    <td t-esc="order.product"/>
+                                    <td>L<t t-esc="order.level"/></td>
+                                    <td t-esc="order.qty"/>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-danger"
+                                                t-on-click="() => this.removeOrder(order.id)">
+                                            Remove
+                                        </button>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </t>
+            </div>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="d-flex gap-2 mb-4">
+            <button class="btn btn-primary btn-lg" t-on-click="generatePlan"
+                    t-att-disabled="state.calculating || !state.orders.length">
+                <t t-if="state.calculating">
+                    <span class="spinner-border spinner-border-sm me-1"/> Generating...
+                </t>
+                <t t-else="">
+                    Generate Draft Plan
+                </t>
+            </button>
+            <button class="btn btn-success btn-lg" t-on-click="savePlan"
+                    t-att-disabled="!state.planResult || state.loading">
+                <t t-if="state.loading">
+                    <span class="spinner-border spinner-border-sm me-1"/> Saving...
+                </t>
+                <t t-else="">
+                    Save Plan
+                </t>
+            </button>
+        </div>
+
+        <!-- SUMMARY CARDS -->
+        <t t-if="state.planResult">
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="card border-primary">
+                        <div class="card-body text-center">
+                            <h6 class="card-subtitle mb-2 text-muted letter-spacing-1">HIND QUARTER</h6>
+                            <h3 class="card-title text-primary mb-0">
+                                <t t-esc="effectiveHQ"/> kg
+                            </h3>
+                            <t t-if="state.whatIfDeltaHQ">
+                                <small class="text-warning">
+                                    (delta: <t t-esc="state.whatIfDeltaHQ.toFixed(1)"/> kg)
+                                </small>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card border-primary">
+                        <div class="card-body text-center">
+                            <h6 class="card-subtitle mb-2 text-muted letter-spacing-1">FORE QUARTER</h6>
+                            <h3 class="card-title text-primary mb-0">
+                                <t t-esc="effectiveFQ"/> kg
+                            </h3>
+                            <t t-if="state.whatIfDeltaFQ">
+                                <small class="text-warning">
+                                    (delta: <t t-esc="state.whatIfDeltaFQ.toFixed(1)"/> kg)
+                                </small>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+
+        <!-- WHAT IF SIMULATOR -->
+        <t t-if="state.planResult and state.planResult.end_cut_demands">
+            <div class="card mb-4">
+                <div class="card-header bg-warning bg-opacity-25">
+                    <strong>What If Simulator - Yield Overrides</strong>
+                    <small class="text-muted ms-2">(instant delta, no server call)</small>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <t t-foreach="Object.entries(state.planResult.end_cut_demands || {})" t-as="entry" t-key="entry[0]">
+                            <div class="col-md-3">
+                                <label class="form-label small" t-esc="entry[0]"/>
+                                <input type="number" class="form-control form-control-sm"
+                                       min="1" max="100" step="1"
+                                       t-att-value="state.whatIfYieldOverrides[entry[0]] || ''"
+                                       placeholder="Override %"
+                                       t-on-input="(ev) => this.applyWhatIfYield(entry[0], ev.target.value)"/>
+                            </div>
+                        </t>
+                    </div>
+                    <button class="btn btn-warning btn-sm mt-3" t-on-click="recalculateWithOverrides"
+                            t-att-disabled="state.calculating">
+                        Recalculate (Full Server Plan)
+                    </button>
+                </div>
+            </div>
+        </t>
+
+        <!-- PLANNING LOG -->
+        <t t-if="state.planSteps.length">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Planning Log</strong>
+                    <small class="text-muted ms-2">
+                        (<t t-esc="state.planSteps.length"/> step(s))
+                    </small>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush" style="max-height: 500px; overflow-y: auto;">
+                        <t t-foreach="state.planSteps" t-as="step" t-key="step_index">
+                            <div class="list-group-item py-1 px-3"
+                                 t-att-class="step.indent ? 'ps-5' : ''">
+                                <span t-att-class="stepBadgeClass(step.type)">
+                                    <strong t-if="step.type === 'header'" t-esc="step.title"/>
+                                    <span t-else="" t-esc="step.title"/>
+                                </span>
+                                <t t-if="step.detail">
+                                    <br/>
+                                    <small class="text-muted" t-esc="step.detail"/>
+                                </t>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </t>
+
+    </div>
+</t>
+
+</templates>

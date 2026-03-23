@@ -1,0 +1,11 @@
+.bawa-planning-engine,
+.bawa-supply-planner {
+    .letter-spacing-1 {
+        letter-spacing: 0.08em;
+    }
+    .trim-balance-bar {
+        height: 8px;
+        border-radius: 4px;
+        transition: width 0.2s ease;
+    }
+}

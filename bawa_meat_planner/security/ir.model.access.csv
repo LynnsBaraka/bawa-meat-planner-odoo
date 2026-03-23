@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bawa_yield_template_user,bawa.yield.template user,model_bawa_yield_template,base.group_user,1,0,0,0
+access_bawa_yield_template_manager,bawa.yield.template manager,model_bawa_yield_template,base.group_system,1,1,1,1
+access_bawa_plan_user,bawa.plan user,model_bawa_plan,base.group_user,1,1,1,0
+access_bawa_plan_manager,bawa.plan manager,model_bawa_plan,base.group_system,1,1,1,1
+access_bawa_plan_order_line_user,bawa.plan.order.line user,model_bawa_plan_order_line,base.group_user,1,1,1,1
+access_bawa_plan_wizard,bawa.plan.wizard,model_bawa_plan_wizard,base.group_user,1,1,1,1

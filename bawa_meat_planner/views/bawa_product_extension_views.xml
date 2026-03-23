@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Inherit Product Template Form to add Butchery Tab -->
+    <record id="view_product_template_butchery_tab" model="ir.ui.view">
+        <field name="name">product.template.form.butchery</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Butchery" name="butchery">
+                    <group>
+                        <group string="Hierarchy">
+                            <field name="butchery_level"/>
+                            <field name="butchery_category"/>
+                            <field name="butchery_parent_product_id"/>
+                        </group>
+                        <group string="Substitution and Pricing">
+                            <field name="can_convert_l4"/>
+                            <field name="can_convert_l5"/>
+                            <field name="retail_price_estimate"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

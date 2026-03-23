@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+<t t-name="bawa_meat_planner.SupplyPlanner">
+    <div class="bawa-supply-planner o_action p-3">
+
+        <!-- HEADER -->
+        <h2 class="mb-4">Supply Planner</h2>
+
+        <!-- MODE SWITCHER -->
+        <div class="btn-group mb-4" role="group">
+            <button type="button" class="btn"
+                    t-att-class="state.mode === 'carcass' ? 'btn-primary' : 'btn-outline-primary'"
+                    t-on-click="() => this.setMode('carcass')">
+                Carcass
+            </button>
+            <button type="button" class="btn"
+                    t-att-class="state.mode === 'quarters' ? 'btn-primary' : 'btn-outline-primary'"
+                    t-on-click="() => this.setMode('quarters')">
+                Quarter
+            </button>
+            <button type="button" class="btn"
+                    t-att-class="state.mode === 'primals' ? 'btn-primary' : 'btn-outline-primary'"
+                    t-on-click="() => this.setMode('primals')">
+                Primal
+            </button>
+        </div>
+
+        <!-- CARCASS MODE -->
+        <t t-if="state.mode === 'carcass'">
+            <div class="card mb-4">
+                <div class="card-header"><strong>Carcass Input</strong></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Number of Animals</label>
+                            <input type="number" class="form-control" min="0"
+                                   t-att-value="state.carcassCount"
+                                   t-on-input="updateCarcassCount"/>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Avg HQ Weight (kg)</label>
+                            <input type="number" class="form-control" min="0" step="0.1"
+                                   t-att-value="state.avgHQWeightKg"
+                                   t-on-input="updateAvgHQ"/>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Avg FQ Weight (kg)</label>
+                            <input type="number" class="form-control" min="0" step="0.1"
+                                   t-att-value="state.avgFQWeightKg"
+                                   t-on-input="updateAvgFQ"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+
+        <!-- QUARTER MODE -->
+        <t t-if="state.mode === 'quarters'">
+            <div class="card mb-4">
+                <div class="card-header"><strong>Quarter Input</strong></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Hind Quarter (kg)</label>
+                            <input type="number" class="form-control" min="0" step="0.1"
+                                   t-att-value="state.quarterInputs['Hind Quarter']"
+                                   t-on-input="(ev) => this.updateQuarterInput('Hind Quarter', ev)"/>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Fore Quarter (kg)</label>
+                            <input type="number" class="form-control" min="0" step="0.1"
+                                   t-att-value="state.quarterInputs['Fore Quarter']"
+                                   t-on-input="(ev) => this.updateQuarterInput('Fore Quarter', ev)"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+
+        <!-- PRIMAL MODE -->
+        <t t-if="state.mode === 'primals'">
+            <div class="card mb-4">
+                <div class="card-header"><strong>Primal Input</strong></div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <t t-foreach="availablePrimals" t-as="primal" t-key="primal">
+                            <div class="col-md-3">
+                                <label class="form-label small" t-esc="primal"/>
+                                <input type="number" class="form-control form-control-sm" min="0" step="0.1"
+                                       t-att-value="state.primalInputs[primal] || 0"
+                                       t-on-input="(ev) => this.updatePrimalInput(primal, ev)"/>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </t>
+
+        <!-- RUN BUTTON -->
+        <button class="btn btn-primary btn-lg mb-4" t-on-click="runForward"
+                t-att-disabled="state.loading">
+            <t t-if="state.loading">
+                <span class="spinner-border spinner-border-sm me-1"/> Calculating...
+            </t>
+            <t t-else="">
+                Run Forward Explosion
+            </t>
+        </button>
+
+        <!-- RESULTS -->
+        <t t-if="state.forwardResult">
+
+            <!-- QUARTER SUMMARY -->
+            <div class="row g-3 mb-4">
+                <t t-foreach="Object.entries(state.forwardResult.quarter_qtys || {})" t-as="q" t-key="q[0]">
+                    <div class="col-md-3">
+                        <div class="card border-primary">
+                            <div class="card-body text-center">
+                                <h6 class="card-subtitle mb-2 text-muted letter-spacing-1" t-esc="q[0]"/>
+                                <h3 class="card-title text-primary mb-0">
+                                    <t t-esc="q[1]"/> kg
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+                <div class="col-md-3">
+                    <div class="card border-info">
+                        <div class="card-body text-center">
+                            <h6 class="card-subtitle mb-2 text-muted letter-spacing-1">TOTAL TRIM</h6>
+                            <h3 class="card-title text-info mb-0">
+                                <t t-esc="totalTrimKg"/> kg
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- L3 END CUT OUTPUTS (READ ONLY: DETERMINISTIC) -->
+            <t t-if="Object.keys(state.forwardResult.end_cut_outputs || {}).length">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <strong>L3 End Cut Outputs</strong>
+                        <small class="text-muted ms-2">(deterministic: anatomy decides)</small>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-sm mb-0">
+                            <thead>
+                                <tr><th>Product</th><th>Output (kg)</th></tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="Object.entries(state.forwardResult.end_cut_outputs || {})" t-as="cut" t-key="cut[0]">
+                                    <tr>
+                                        <td t-esc="cut[0]"/>
+                                        <td t-esc="cut[1]"/>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </t>
+
+            <!-- L4 ALLOCATION INPUTS -->
+            <div class="card mb-4">
+                <div class="card-header bg-info bg-opacity-25">
+                    <strong>L4 Value Add Allocations</strong>
+                    <small class="text-muted ms-2">(competing pool: allocate trim)</small>
+                </div>
+                <div class="card-body">
+                    <!-- Trim Balance Bar -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <small>Trim Allocated: <t t-esc="trimAllocated"/> kg</small>
+                            <small>Balance: <t t-esc="trimBalance"/> kg</small>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar trim-balance-bar"
+                                 t-att-class="trimBalance &lt; 0 ? 'bg-danger' : 'bg-success'"
+                                 t-att-style="'width: ' + Math.min(100, Math.max(0, (trimAllocated / (totalTrimKg || 1)) * 100)) + '%'"/>
+                        </div>
+                    </div>
+                    <div class="row g-2">
+                        <t t-foreach="availableL4Products" t-as="l4" t-key="l4">
+                            <div class="col-md-3">
+                                <label class="form-label small" t-esc="l4"/>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" min="0" step="0.1"
+                                           t-att-class="'form-control' + (isOverAllocated(l4) ? ' is-invalid' : '')"
+                                           t-att-value="state.l4Allocations[l4] || 0"
+                                           t-on-input="(ev) => this.updateL4Allocation(l4, ev)"/>
+                                    <span class="input-group-text">kg</span>
+                                </div>
+                                <t t-if="state.forwardResult.l4_max_possible">
+                                    <small class="text-muted">
+                                        max: <t t-esc="state.forwardResult.l4_max_possible[l4] || 0"/> kg
+                                    </small>
+                                </t>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+
+            <!-- L5 TARGETS -->
+            <div class="card mb-4">
+                <div class="card-header bg-success bg-opacity-25">
+                    <strong>L5 Finished Product Targets</strong>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <t t-foreach="availableL5Products" t-as="l5" t-key="l5">
+                            <div class="col-md-3">
+                                <label class="form-label small" t-esc="l5"/>
+                                <div class="input-group input-group-sm">
+                                    <input type="number" class="form-control" min="0" step="0.1"
+                                           t-att-value="state.l5Targets[l5] || 0"
+                                           t-on-input="(ev) => this.updateL5Target(l5, ev)"/>
+                                    <span class="input-group-text">kg</span>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RECALCULATE + CONVERT BUTTONS -->
+            <div class="d-flex gap-2 mb-4">
+                <button class="btn btn-info" t-on-click="recalculateWithAllocations"
+                        t-att-disabled="state.loading">
+                    Recalculate Feasibility
+                </button>
+                <button class="btn btn-success" t-on-click="convertToOrders">
+                    Convert to Orders
+                </button>
+            </div>
+
+            <!-- FEASIBILITY PANEL -->
+            <t t-if="state.forwardResult.feasibility and state.forwardResult.feasibility.checks.length">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <strong>Feasibility Check</strong>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-sm mb-0">
+                            <thead>
+                                <tr>
+                                    <th>L5 Product</th>
+                                    <th>L4 Input</th>
+                                    <th>Needed (kg)</th>
+                                    <th>Allocated (kg)</th>
+                                    <th>Gap (kg)</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="state.forwardResult.feasibility.checks" t-as="check" t-key="check_index">
+                                    <tr>
+                                        <td t-esc="check.l5_product"/>
+                                        <td t-esc="check.l4_product"/>
+                                        <td t-esc="check.l4_needed"/>
+                                        <td t-esc="check.l4_allocated"/>
+                                        <td t-esc="check.gap"/>
+                                        <td>
+                                            <span t-att-class="feasibilityStatusClass(check.status)"
+                                                  t-esc="check.status.toUpperCase()"/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </t>
+
+        </t>
+
+    </div>
+</t>
+
+</templates>
